@@ -8,6 +8,7 @@ require_relative '../lib/phase3/controller_base'
 
 class MyController < Phase3::ControllerBase
   def go
+    @stuff = "WOAH"
     render :show
   end
 end

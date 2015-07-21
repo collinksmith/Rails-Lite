@@ -33,4 +33,12 @@ module Phase2
       res.body = content
     end
   end
+
+  def ivars
+    self.instance_variables.each do |var|
+      var = send(var.to_sym)
+      p var
+    end
+    binding
+  end
 end
