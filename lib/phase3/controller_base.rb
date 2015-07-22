@@ -12,7 +12,6 @@ module Phase3
     def render(template_name)
       raw_content = File.read("views/#{self.class.to_s.underscore}/#{template_name.to_s}.html.erb")
       final_content = ERB.new(raw_content).result(binding)
-      # byebug
       render_content(final_content, "text/html")
     end
   end

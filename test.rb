@@ -1,34 +1,45 @@
+# def set_hash(keys, value)
+#   h = {}
+
+#   keys.map!(&:to_sym)
+
+#   keys.length.times do |i|
+#     s = "h"
+#     (0..i).each do |j|
+#       s << "['#{keys[j]}']"
+#     end
+
+#     if i == (keys.length - 1)
+#       s << " = value"
+#       eval(s)
+#     else
+#       s << " = {}"
+#       eval(s)
+#     end
+#   end
+#   h
+# end
+$params = {}
 def set_hash(keys, value)
-  h = {}
+  params = {}
+  current = params
 
-  keys.map!(&:to_sym)
-
-  keys.length.times do |i|
-    s = "h"
-    (0..i).each do |j|
-      s << "['#{keys[j]}']"
-    end
-
-    if i == (keys.length - 1)
-      s << " = value"
-      eval(s)
+  keys.each_with_index do |key, index|
+    if index == keys.length - 1
+      current[key] = value
     else
-      s << " = {}"
-      eval(s)
+      current[key] ||= {}
     end
+    current = current[key]
   end
-  h
+
+  params
 end
 
-h = set_hash(['user', 'address', 'street'], 'main')
+h1 = set_hash(['user', 'address', 'street'], 'main')
+h2 = set_hash(['user', 'address', 'number'], 1357)
 
-class Hash
-  def deep_merge(second)
-      merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
-      self.merge(second, &merger)
-  end
-end
+p h1
+p h2
 
-h = h.deep_merge({'user' => { 'address' => { 'number' => 1357 }}})
-
-p h
+p h1.deep_merge(h2)

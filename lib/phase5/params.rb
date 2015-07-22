@@ -1,13 +1,6 @@
 require 'uri'
 require 'byebug'
 
-class Hash
-  def deep_merge(second)
-      merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
-      self.merge(second, &merger)
-  end
-end
-
 module Phase5
   class Params
     # use your initialize to merge params from
@@ -23,8 +16,6 @@ module Phase5
       parse_www_encoded_form(req.body) unless req.body.nil?
 
       @params = @params.deep_merge(route_params)
-
-      @params
     end
 
     def [](key)
@@ -51,32 +42,22 @@ module Phase5
         keys = parse_key(pair.first)
         value = pair.last
 
-        h = set_hash(keys, value)
-        @params = @params.deep_merge(h)
+        set_hash(keys, value)
       end
     end
 
-  def set_hash(keys, value)
-    hash = {}
-    keys.map!(&:to_s)
+    def set_hash(keys, value)
+      current = @params
 
-    keys.length.times do |i|
-      eval_string = "hash"
-      (0..i).each do |j|
-        eval_string << "['#{keys[j]}']"
-      end
-
-      if i == (keys.length - 1)
-        eval_string << " = value"
-        eval(eval_string)
-      else
-        eval_string << " = {}"
-        eval(eval_string)
+      keys.each_with_index do |key, index|
+        if index == keys.length - 1
+          current[key] = value
+        else
+          current[key] ||= {}
+        end
+        current = current[key]
       end
     end
-
-    hash
-  end
 
     # this should return an array
     # user[address][street] should return ['user', 'address', 'street']
