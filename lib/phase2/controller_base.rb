@@ -28,8 +28,8 @@ module Phase2
       raise if already_built_response?
       @already_built_response = true
 
-      res.content_type = content_type
-      res.body = content
+      @res.content_type = content_type
+      @res.body = content
     end
   end
 end

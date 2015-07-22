@@ -11,15 +11,24 @@ def set_hash(keys, value)
 
     if i == (keys.length - 1)
       s << " = value"
-      p s
       eval(s)
     else
       s << " = {}"
-      p s
       eval(s)
     end
   end
   h
 end
 
-p set_hash(['user', 'address', 'street'], 'main')
+h = set_hash(['user', 'address', 'street'], 'main')
+
+class Hash
+  def deep_merge(second)
+      merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+      self.merge(second, &merger)
+  end
+end
+
+h = h.deep_merge({'user' => { 'address' => { 'number' => 1357 }}})
+
+p h

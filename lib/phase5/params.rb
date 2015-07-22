@@ -1,6 +1,13 @@
 require 'uri'
 require 'byebug'
 
+class Hash
+  def deep_merge(second)
+      merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+      self.merge(second, &merger)
+  end
+end
+
 module Phase5
   class Params
     # use your initialize to merge params from
@@ -15,15 +22,13 @@ module Phase5
       parse_www_encoded_form(req.query_string) unless req.query_string.nil?
       parse_www_encoded_form(req.body) unless req.body.nil?
 
-      @params.merge!(route_params)
-
-      p @params
+      @params = @params.deep_merge(route_params)
 
       @params
     end
 
     def [](key)
-      @params[key.to_s]
+      @params[key.to_s] || @params[key.to_sym]
     end
 
     # this will be useful if we want to `puts params` in the server log
@@ -47,8 +52,7 @@ module Phase5
         value = pair.last
 
         h = set_hash(keys, value)
-        p h
-        @params.merge!(h)
+        @params = @params.deep_merge(h)
       end
     end
 
