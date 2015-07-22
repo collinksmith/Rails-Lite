@@ -1,4 +1,3 @@
-require 'byebug'
 module Phase2
   class ControllerBase
     attr_reader :req, :res
@@ -32,13 +31,5 @@ module Phase2
       res.content_type = content_type
       res.body = content
     end
-  end
-
-  def ivars
-    self.instance_variables.each do |var|
-      var = send(var.to_sym)
-      p var
-    end
-    binding
   end
 end
