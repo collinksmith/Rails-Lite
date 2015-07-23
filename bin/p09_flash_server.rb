@@ -12,6 +12,11 @@ class MyController < Phase9::ControllerBase
     render :blank
   end
 
+  def flashred
+    flash["test"] = "Testing flash redirection"
+    redirect_to :see
+  end
+
   def see_flash
     render :flash
   end
@@ -22,6 +27,7 @@ class MyController < Phase9::ControllerBase
   end
 
   def nowren
+    flash["test"] = "Testing merge of flash and flash.now."
     flash.now["test"] = "Testing flash.now render. You should see this!"
     render :flash
   end
@@ -38,6 +44,8 @@ server.mount_proc('/') do |req, res|
     MyController.new(req, res).nowred
   when '/nowren'
     MyController.new(req, res).nowren
+  when '/flashred'
+    MyController.new(req, res).flashred
   end
 end
 

@@ -6,30 +6,25 @@ module Phase9
     def initialize(req)
       req.cookies.each do |cookie|
         if cookie.name == '_rails_lite_app'
-          value = JSON.parse(cookie.value)
-          cookie = value
+          cookie = JSON.parse(cookie.value)
 
-          cookie.keys.each do |key|
-            if key == "flash"
-              @flash_cookie = cookie[key] 
-              return
-            end
-          end
+          return if set_flash_cookie(cookie)
         end
       end
 
       @flash_cookie = {}
     end
 
+    # This method returns any values with this key associated with either 
+    # flash or flash.now. If they both have this key, it returns both values in an array.
     def [](key)
       if @flash_cookie[key] && now[key]
-        @flash_cookie[key][0].deep_merge(@now[key])
+        [@flash_cookie[key][0], @now[key]]
       elsif @flash_cookie[key]
         @flash_cookie[key][0]
       else
         now[key] || nil
       end
-      # @flash_cookie[key] ? @flash_cookie[key][0] : nil
     end
 
     def []=(key, value)
@@ -40,6 +35,7 @@ module Phase9
       @now ||= FlashNow.new
     end
 
+    # Stores all flash data in a separate 'flash' hash in the browser's cookie.
     def store_flash(res)
       cookie = { 'flash' => {} }
 
@@ -54,6 +50,8 @@ module Phase9
     def increment
       new_cookie = { }
 
+      # Each value has a counter associated with it
+      # If the counter is at 0, increment it. If it's at 1, get rid of the value
       @flash_cookie.keys.each do |key|
         if @flash_cookie[key][1] == 0
           @flash_cookie[key][1] += 1
@@ -62,6 +60,18 @@ module Phase9
       end
 
       @flash_cookie = new_cookie
+    end
+
+    private
+
+    def set_flash_cookie(cookie)
+      cookie.keys.each do |key|
+        if key == "flash"
+          @flash_cookie = cookie[key] 
+          return true
+        end
+      end
+      false
     end
   end
 end
