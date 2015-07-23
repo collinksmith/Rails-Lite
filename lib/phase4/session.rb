@@ -9,7 +9,6 @@ module Phase4
       req.cookies.each do |cookie|
         if cookie.name == '_rails_lite_app'
           value = JSON.parse(cookie.value)
-          p value
           @cookie = value
           return
         end

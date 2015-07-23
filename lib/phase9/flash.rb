@@ -1,4 +1,5 @@
 require_relative '../phase4/session.rb'
+require_relative 'flashnow.rb'
 
 module Phase9
   class Flash
@@ -21,12 +22,22 @@ module Phase9
     end
 
     def [](key)
-      @flash_cookie[key] ? @flash_cookie[key][0] : nil
+      if @flash_cookie[key] && now[key]
+        @flash_cookie[key][0].deep_merge(@now[key])
+      elsif @flash_cookie[key]
+        @flash_cookie[key][0]
+      else
+        now[key] || nil
+      end
+      # @flash_cookie[key] ? @flash_cookie[key][0] : nil
     end
 
     def []=(key, value)
       @flash_cookie[key] = [value, 0]
-      p "FLASH COOKIE: #{@flash_cookie}"
+    end
+
+    def now
+      @now ||= FlashNow.new
     end
 
     def store_flash(res)
