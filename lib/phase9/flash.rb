@@ -9,13 +9,15 @@ module Phase9
           cookie = value
 
           cookie.keys.each do |key|
-            @flash_cookie = cookie[key] if key == "flash"
+            if key == "flash"
+              @flash_cookie = cookie[key] 
+              return
+            end
           end
-
         end
       end
 
-      @flash_cookie ||= {}
+      @flash_cookie = {}
     end
 
     def [](key)
@@ -31,14 +33,24 @@ module Phase9
       cookie = { 'flash' => {} }
 
       @flash_cookie.keys.each do |key|
-        if @flash_cookie[key][1] == 0
-          @flash_cookie[key][1] += 1
-          cookie['flash'][key] = @flash_cookie[key]
-        end
+        cookie['flash'][key] = @flash_cookie[key]
       end
 
       browser_cookie = WEBrick::Cookie.new("_rails_lite_app", cookie.to_json)
       res.cookies << browser_cookie
+    end
+
+    def increment
+      new_cookie = { }
+
+      @flash_cookie.keys.each do |key|
+        if @flash_cookie[key][1] == 0
+          @flash_cookie[key][1] += 1
+          new_cookie[key] = @flash_cookie[key]
+        end
+      end
+
+      @flash_cookie = new_cookie
     end
   end
 end

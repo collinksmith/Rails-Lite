@@ -3,9 +3,14 @@ require_relative './flash'
 
 module Phase9
   class ControllerBase < Phase6::ControllerBase
+    def initialize(req, res, route_params = {})
+      super(req, res, route_params)
+      flash.increment
+    end
+
     def redirect_to(url)
       super(url)
-      session.store_flash(@res)
+      flash.store_flash(@res)
     end
 
     def render_content(content, content_type)
